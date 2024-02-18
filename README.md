@@ -63,7 +63,6 @@ PORT = 3000
 NODE_ENV=development
 SESSION_SECRET=<YOUR_SESSION_SECRET>
 COOKIE_SECRET=<YOUR_COOKIE_SECRET>
-LOG_ACTIVE=true
 DRIVE_DISK=local
 
 # Database
@@ -257,7 +256,7 @@ You can abbreviate the command using the command line, generator and file name, 
 
 ## Logs
 
-You can enable or disable logs in the .env file by changing the value of LOG_ACTIVE. If the NODE_ENV is development, a log file will be created within the `app/logs` folder with the name of the day of the log and the file extension ".log". If NODE_ENV is production, a log file will be created daily and compressed at the end of the day. The file will be compressed if the file reaches 5mb. You can create a task to send the log files that were compressed to a bucket in AWS.
+You can enable or disable logs in the `app/config/logs.ts` file by changing the value of active property. If the NODE_ENV is development, a log file will be created within the `app/logs` folder with the name of the day of the log and the file extension ".log". If NODE_ENV is production, a log file will be created daily and compressed at the end of the day. The file will be compressed if the file reaches 5mb. You can create a task to send the log files that were compressed to a bucket in AWS.
 
 ## Authentication
 
