@@ -6,15 +6,21 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
 
 - [HefestosJS Docs](#hefestosjs-docs)
   - [Installation](#installation)
-  - [Commands](#commands)
+  - [Command Scripts](#command-scripts)
   - [Env](#env)
-  - [Routes](#routes)
   - [Database](#database)
+  - [Routes](#routes)
+  - [Controllers](#controllers)
+  - [Services](#services)
   - [Upload and Middlewares](#upload-and-middlewares)
   - [Layouts, views and partials](#layouts-views-and-partials)
   - [Validation](#validation)
   - [Tests](#tests)
   - [Tasks and Jobs](#tasks-and-jobs)
+  - [Security](#security)
+  - [Static Assets](#static-assets)
+  - [Generate files](#generate-files)
+  - [Logs](#logs)
   - [Authentication](#authentication)
   - [Mailer](#mailer)
   - [References](#references)
@@ -27,7 +33,7 @@ You can create a new project using the command:
 npx hefestos-forge hello-world
 ```
 
-## Commands
+## Command Scripts
 
 - `build` - delete the current dist folder (if exists), copy the resources files (views, partials, layouts) and transpile the typescript to the dist folder.
 
@@ -86,6 +92,10 @@ S3_BUCKET_PATH=https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com/projects
 
 ```
 
+## Database
+
+We use Prisma ORM to handle the database. You can create new models from the schema.prisma file located in the `app/database/schema.prisma` directory. You can also export the models, for easier use, from `app/database/index.ts`.
+
 ## Routes
 
 You will often create resourceful routes to do CRUD operations on a resource.
@@ -125,11 +135,52 @@ useRouter.get("/", (req, res) => res.render("home"));
 export default useRouter;
 ```
 
-## Database
+## Controllers
 
-We use Prisma ORM to handle the database. You can create new models from the schema.prisma file located in the `app/database/schema.prisma` directory. You can also export the models, for easier use, from `app/database/index.ts`.
+Responsible for handling requests and directing them to the appropriate action, the controller is a class and can have as many and as many functions as you want, but if you use the `.resources` method or if you generate the controller using the command line, by default, the functions that must exist in the controller are:
 
-We recommend that you use https://prismabuilder.io to speed up the model development process.
+- index
+- show
+- create
+- store
+- edit
+- update
+- destroy
+
+You can import the Request and Response interfaces from within "core", for example: `import { Request, Response } from "core";`. If you are building an api, you can also import and use ApiResponse which contains the functions:
+
+- success,
+- pagination,
+- error
+- appError
+
+In the example file "UserController.ts", it uses ApiResponse, Request and Response.
+
+## Services
+
+The service is a class and can have as many functions as you want, but if you generate the Service using the command line, by default, the functions that are created next to the service are:
+
+- index
+- show
+- store
+- update
+- destroy
+
+You can import the AppError interface from within "core" to trigger specific errors, for example: `import { AppError } from "core";`. If necessary, you can also import the ResponseUtils file, which has functions that help with pagination, deleting data, such as a password, an object or an array of objects. The functions are:
+
+- page,
+- exclude,
+- excludeFromList
+
+In the example file "UserService.ts", AppError and ResponseUtils are used.
+
+An example of using AppError would be if a specific user was not found:
+
+`if (!user) throw AppError.E_NOT_FOUND();`
+
+## Validation
+
+We use Zod as validator. For more references about Zod, access the official documentation at https://zod.dev/
 
 ## Upload and Middlewares
 
@@ -163,10 +214,6 @@ We use Nunjucks as template engine. For more references about nunjucks, access t
 
 Layouts, views, and partials must remain in their respective directories. Inside the resources directory we have layouts, views, partials and js. You can create folders inside these directories, but keep the .nj files inside these directories.
 
-## Validation
-
-We use Zod as validator. For more references about Zod, access the official documentation at https://zod.dev/
-
 ## Tests
 
 We use Jest or automation testing. For more references about Jest, access the official documentation at https://jestjs.io/
@@ -178,6 +225,39 @@ For create a new periodic task, you can use the command line, `yarn g`, select t
 We use the node-cron library under the hood, so for more information, visit the official documentation at https://github.com/node-cron/node-cron
 
 Lastly, you must register the new task by going to app/tasks/index.ts, importing the new task and passing it to this.jobs, within the constructor, as shown in the example code present in the project.
+
+## Security
+
+By default, following the Content Security Policy directives, you cannot use in-line javascript or display images from unregistered urls, so within `app/config/security.ts` you can change the directives you want to, for example, For example, allow the creation and use of <scripts></scripts> within the view. If you don't change anything, the images and assets used in the views must be in some static assets folder; The javascript codes must be in files within the `app/resources/js` folder and called within the view in question.
+
+## Static assets
+
+Static assets can be divided into css, js, images and assets in general. Inside the public folder, you can create, if it doesn't already exist, the images and assets folders. The directory for js files is inside the `app/resources/js` folder. The urls are:
+
+- /css
+- /js
+- /images
+- /assets
+
+If DRIVE chosen in the .env file is "local", you can create the "uploads" folder inside the project root. This is where the files will be saved. To access the files saved in the "uploads" folder you can access the url `/files`.
+
+## Generate files
+
+Using the `npm run g` command line you can generate:
+
+- controller
+- service
+- validation
+- task
+- test
+- layout
+- view
+
+You can abbreviate the command using the command line, generator and file name, for example: `npm run g controller Post`. The "PostController.ts" file will be created inside the `app/controllers` folder.
+
+## Logs
+
+You can enable or disable logs in the .env file by changing the value of LOG_ACTIVE. If the NODE_ENV is development, a log file will be created within the `app/logs` folder with the name of the day of the log and the file extension ".log". If NODE_ENV is production, a log file will be created daily and compressed at the end of the day. The file will be compressed if the file reaches 5mb. You can create a task to send the log files that were compressed to a bucket in AWS.
 
 ## Authentication
 
@@ -208,4 +288,3 @@ We use some libraries under the hood, so for more informations, visit the offici
 - AWS SDK
 - Nunjucks
 - Tailwind
-- DaisyUI
