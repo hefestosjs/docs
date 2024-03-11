@@ -187,7 +187,13 @@ We use Zod as validator. For more references about Zod, access the official docu
 
 ## Upload and Middlewares
 
-You can import the upload module and pass it as middleware, like:
+In direct routes, you can pass a middleware to a route after the path, for example:
+`useRouter.get('/users', isAuthenticated, (req, res) => res.render('users));`
+
+In resource routes, you can pass a middleware within an array after the Controller, for example:
+`useRouter.resources("users", "UsersController", [isAuthenticated]);`
+
+You can import the upload module and pass it as middleware, for example:
 
 ```
 import { Router } from "core/router";
