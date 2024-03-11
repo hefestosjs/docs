@@ -18,6 +18,7 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
   - [Tests](#tests)
   - [Tasks and Jobs](#tasks-and-jobs)
   - [Security](#security)
+  - [Performance](#performance)
   - [Static Assets](#static-assets)
   - [Generate files](#generate-files)
   - [Logs](#logs)
@@ -64,6 +65,9 @@ NODE_ENV=development
 SESSION_SECRET=<YOUR_SESSION_SECRET>
 COOKIE_SECRET=<YOUR_COOKIE_SECRET>
 DRIVE_DISK=local
+SSL=false
+JWT_SECRET=secret
+SESSION_SECRET=secret
 
 # Database
 DB_USER=<YOUR_DB_USER>
@@ -229,6 +233,49 @@ Lastly, you must register the new task by going to app/tasks/index.ts, importing
 
 By default, following the Content Security Policy directives, you cannot use in-line javascript or display images from unregistered urls, so within `app/config/security.ts` you can change the directives you want to, for example, For example, allow the creation and use of <scripts></scripts> within the view. If you don't change anything, the images and assets used in the views must be in some static assets folder; The javascript codes must be in files within the `app/resources/js` folder and called within the view in question.
 
+## Performance
+
+To improve our application performance, we can use some strategies like cache, cluster and compression.
+Inside the `app/config/performance.ts` file, you can active cluster server, cache strategy and define cache life time in seconds. If cache is active, we'll use redis to store the cache.
+
+We can cache our query results like:
+
+```
+  // app/services/UserService.ts
+
+  static async index(currentPage: number = 1) {
+    const perPage = 10;
+    const page = currentPage ? currentPage : 1;
+    const skip = (page - 1) * perPage;
+
+    // Cache
+    const key = `users.list.params=${skip}_${perPage}`;
+    const cached = await useCache.get(key);
+
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    // Queries
+    const totalUsers = await User.count();
+    const query = await User.findMany({ take: perPage, skip });
+    const users = ResponseUtils.excludeFromList(query, ["password"]);
+
+    const response = ResponseUtils.paginate({
+      data: users,
+      totalData: totalUsers,
+      page,
+      perPage,
+    });
+
+    await useCache.set(key, JSON.stringify(response));
+
+    return response;
+  }
+```
+
+From 100kb the response will be compressed with gzip. If you don't want to compress some page, you can pass `x-no-compression`header.
+
 ## Static assets
 
 Static assets can be divided into css, js, images and assets in general. Inside the public folder, you can create, if it doesn't already exist, the images and assets folders. The directory for js files is inside the `app/resources/js` folder. The urls are:
@@ -260,6 +307,125 @@ You can enable or disable logs in the `app/config/logs.ts` file by changing the 
 
 ## Authentication
 
+We have 2 strategies, session and token. You can configure your authentication options like table and unique column used to sign in, strategy and more inside `app/config/auth.ts`.
+
+```
+const auth: AuthConfig = {
+  strategy: "web",
+  table: "users",
+  uniqueColumn: "email",
+  tokenStrategy: {
+    secret: process.env.JWT_SECRET || "secret",
+    expiresIn: "30d",
+    useRedis: true,
+  },
+};
+```
+
+### Session Strategy
+
+Inside `app/config/auth.ts` set strategy to "web".
+
+- To make login is like:
+
+  ```
+    static async store(request: Request, response: Response, next: Next) {
+      try {
+        const { email, password } = request.body;
+        const user = await SessionService.getUser(email, password);
+
+        Auth.login({
+          session: {
+            request,
+            response,
+            next,
+            user,
+            redirectPath: "/logout",
+          },
+        });
+      } catch (error: any) {
+        return ApiResponse.error(response, error);
+      }
+    }
+  ```
+
+- To check if a user is authenticated to access a route you can use the middleware isAuthenticated like:
+
+  `useRouter.get("/", isAuthenticated, (req, res) => res.render("home"));`
+
+- To make logout is like:
+  ```
+  static async destroy(request: Request, response: Response, next: Next) {
+    try {
+      Auth.logout({
+        session: {
+          request,
+          response,
+          next,
+          redirectPath: "/login",
+        },
+      });
+    } catch (error: any) {
+      return ApiResponse.error(response, error);
+    }
+  }
+  ```
+
+### Token Strategy
+
+Inside `app/config/auth.ts` set strategy to "token".
+
+- To make login is like:
+
+  ```
+  static async store(request: Request, response: Response, next: Next) {
+    try {
+      const { email, password } = request.body;
+      const user = await SessionService.getUser(email, password);
+
+      const result = await Auth.login({
+        token: {
+          request,
+          response,
+          next,
+          userId: user.id,
+        },
+      });
+
+      return ApiResponse.success(response, result, "/");
+    } catch (error: any) {
+      return ApiResponse.error(response, error);
+    }
+  }
+  ```
+
+- To check if a user is authenticated to access a route you can use the middleware isAuthenticated like:
+
+  `useRouter.get("/", isAuthenticated, (req, res) => res.render("home"));`
+
+PS: remember that if you're using token strategy, you must use the Authorization header, like `Authorization: Bearer {{token}}` replacing "{{token}}" by the token returned in `Auth.login`.
+
+- To make logout is like:
+
+  ```
+  static async destroy(request: Request, response: Response, next: Next) {
+    try {
+      const result = await Auth.logout({
+        token: {
+          request,
+          response,
+        },
+      });
+
+      return ApiResponse.success(response, result, "/");
+    } catch (error: any) {
+      return ApiResponse.error(response, error);
+    }
+  }
+  ```
+
+Both the session and the tokens are stored within redis. If, when using token strategy, you do not want to store the token in redis or if you want to make any changes, you can modify in `vendor/auth/token.ts`.
+
 ## Mailer
 
 ## Author
@@ -274,13 +440,17 @@ We use some libraries under the hood, so for more informations, visit the offici
 
 - Express.js
 - Express Session
+- JsonWebToken
+- Compression
+- Redis
+- Connect Reddis
+- UUID
 - Prisma
 - Helmet
 - Cookie parser
 - Morgan
 - Multer
 - Nodemailer
-- Passport
 - Zod
 - Jest
 - Cors
