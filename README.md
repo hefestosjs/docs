@@ -13,6 +13,7 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
   - [Controllers](#controllers)
   - [Services](#services)
   - [Upload and Middlewares](#upload-and-middlewares)
+  - [Helpers and Hooks](#helpers-and-hooks)
   - [Layouts, views and partials](#layouts-views-and-partials)
   - [Validation](#validation)
   - [Tests](#tests)
@@ -215,6 +216,96 @@ registerRouter("/", (req, res, next) => {
   console.log('Request Type:', req.method);
   next();
 })
+```
+
+## Helpers and Hooks
+
+**AppError**
+
+```javascript
+// Example: used when an unexpected error occurs
+throw AppError.E_BAD_REQUEST();
+
+// Example: used when a route is prohibited for a user's role
+throw AppError.E_FORBIDDEN();
+
+// Used for generic errors
+throw AppError.E_GENERIC_ERROR();
+
+// Example: used when trying to log in with invalid credentials
+throw AppError.E_INVALID_CREDENTIALS();
+
+// Used for logic errors
+throw AppError.E_LOGIC_ERROR();
+
+// Example: used when a user tries to access data that does not exist
+throw AppError.E_NOT_FOUND();
+
+// Example: used when an unauthenticated user try access a private route
+throw AppError.E_UNAUTHORIZED();
+
+// Example: used when a registration fails form validation
+throw AppError.E_VALIDATION_FAIL();
+```
+
+**ResponseUtils**
+
+```typescript
+// Used when you want to delete data from an object.
+// Example: when you access a user's show method and don't want the password to appear in the user object.
+ResponseUtils.exclude(user, ["password", "phone"]);
+
+// Used when you want to delete data from an array of objects.
+// Example: when you access the user list and do not want passwords to appear on objects in that list.
+ResponseUtils.exclude(users, ["password"]);
+
+// ResponseUtils.paginate - used to paginate data
+class UserService {
+  static async index(currentPage: number = 1) {
+    const perPage = 10;
+    const page = currentPage ? currentPage : 1;
+    const totalUsers = await User.count();
+    const users = ResponseUtils.excludeFromList(query, ["password"]);
+
+    return ResponseUtils.paginate({
+      data: users,
+      totalData: totalUsers,
+      page,
+      perPage,
+    });
+  }
+}
+```
+
+**ApiResponse**
+
+```javascript
+// Used when you successfully complete a request
+// Example 1: When you successfully register a new post and then want to redirect the user to the listing screen.
+// Example 2: When you want to display only 1 post.
+ApiResponse.success(response, data, path_for_redirect);
+
+// Used to display paginated data.
+// PS: Recommended to use ResponseUtils.paginate
+ApiResponse.pagination(response, posts);
+
+// Used to display an error
+// Recommended to use in the catch block of a try catch
+ApiResponse.error(response, error);
+
+// Used when you want to display an error like the AppError mentioned above
+// Recommended to use in the catch block of a try catch
+ApiResponse.appError(response, error);
+```
+
+**useCache**
+
+```javascript
+// Used to check whether a given key exists in the cache.
+await useCache.get(key);
+
+// Stores data in the cache, passing the identification key and the data in string format
+await useCache.set(key, JSON.stringify(data));
 ```
 
 ## Layouts, views and partials
