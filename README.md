@@ -257,7 +257,7 @@ ResponseUtils.exclude(user, ["password", "phone"]);
 
 // Used when you want to delete data from an array of objects.
 // Example: when you access the user list and do not want passwords to appear on objects in that list.
-ResponseUtils.exclude(users, ["password"]);
+ResponseUtils.excludeFromList(users, ["password"]);
 
 // ResponseUtils.paginate - used to paginate data
 class UserService {
@@ -524,6 +524,58 @@ PS: remember that if you're using token strategy, you must use the Authorization
 Both the session and the tokens are stored within redis. If, when using token strategy, you do not want to store the token in redis or if you want to make any changes, you can modify in `vendor/auth/token.ts`.
 
 ## Mailer
+
+First you need to set the `SMTP_HOST, SMTP_PORT, SMTP_USER and SMTP_PASSWORD` environment variables.
+
+To send emails, we will use the sendMail function of the Mailer class, which is located in the vendor/mail directory.
+
+**Example:**
+
+```typescript
+await Mailer.sendMail({
+  from: "your_email@email.com",
+  to: "user_email@email.com",
+  subject: "E-mail Subject",
+  text: "E-mail message",
+  html: "HTML code in string format",
+});
+```
+
+We recommend using the renderHtml function that you can import from "core" to turn your HTML email template into a string. We also recommend that you always send the email message in text in addition to HTML.
+
+In renderHtml you will pass the file path with extension, for example: renderHtml("mails/contact.nj");
+
+We recommend keeping email templates in the mails directory.
+
+**Complete Example:**
+
+```typescript
+import { ApiResponse, renderHtml } from "core";
+
+const useRouter = Router();
+
+useRouter.post("/mail", async (request, response) => {
+  try {
+    const htmlString = renderHtml("mails/contact.nj");
+
+    await Mailer.sendMail({
+      from: "your_email@email.com",
+      to: "user_email@email.com",
+      subject: "E-mail Subject",
+      text: "E-mail message",
+      html: htmlString,
+    });
+
+    return ApiResponse.success(response);
+  } catch (error: any) {
+    return ApiResponse.error(response, error);
+  }
+});
+
+export default useRouter;
+```
+
+_We use the nodemailer library, for more information visit its official documentation._
 
 ## Author
 
