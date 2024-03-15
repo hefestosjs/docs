@@ -308,6 +308,15 @@ await useCache.get(key);
 await useCache.set(key, JSON.stringify(data));
 ```
 
+**renderHtml**
+With renderHtml, you can pass variables to the email template using `renderHtml("mails/file.nj", variable_name);`. For example:
+
+```typescript
+renderHtml("mails/marketing.nj", userName);
+```
+
+We recommend keeping email templates in the mails directory.
+
 ## Layouts, views and partials
 
 We use Nunjucks as template engine. For more references about nunjucks, access the official documentation at https://mozilla.github.io/nunjucks/
