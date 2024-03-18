@@ -57,18 +57,18 @@ npx hefestos-forge hello-world
 
 ## Env
 
-Create a .env file from .env.example and fill in the environment variables you will use.
+Create a .env file from .env.example.
+
+See below an example of a complete .env, with database, mailer and amazon s3 variables to configure.
 
 ```
 # Application
 PORT = 3000
 NODE_ENV=development
-SESSION_SECRET=<YOUR_SESSION_SECRET>
-COOKIE_SECRET=<YOUR_COOKIE_SECRET>
 DRIVE_DISK=local
-SSL=false
 JWT_SECRET=secret
 SESSION_SECRET=secret
+COOKIE_SECRET=secret
 
 # Database
 DB_USER=<YOUR_DB_USER>
@@ -93,7 +93,6 @@ S3_BUCKET=<YOUR_S3_BUCKET>
 S3_REGION=<YOUR_S3_REGION>
 S3_ENDPOINT=https://s3.${S3_REGION}.amazonaws.com
 S3_BUCKET_PATH=https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com/projects
-
 ```
 
 ## Database
