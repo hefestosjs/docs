@@ -100,6 +100,14 @@ S3_BUCKET_PATH=https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com/projects
 
 We use Prisma ORM to handle the database. You can create new models from the schema.prisma file located in the `app/database/schema.prisma` directory. You can also export the models, for easier use, from `app/database/index.ts`.
 
+In the .env file, the DB_URL variable changes according to the bank you choose, being:
+
+- PostgreSQL: `DB_URL=postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`
+- MySQL: `DB_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`
+- SQLite: `DB_URL="file:./dev.db"`
+
+For more information, visit the official documentation.
+
 ## Routes
 
 You will often create resourceful routes to do CRUD operations on a resource.
