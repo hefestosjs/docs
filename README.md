@@ -166,8 +166,6 @@ You can import the Request and Response interfaces from within "core", for examp
 - error
 - appError
 
-In the example file "UserController.ts", it uses ApiResponse, Request and Response.
-
 ## Services
 
 The service is a class and can have as many functions as you want, but if you generate the Service using the command line, by default, the functions that are created next to the service are:
@@ -183,8 +181,6 @@ You can import the AppError interface from within "core" to trigger specific err
 - page,
 - exclude,
 - excludeFromList
-
-In the example file "UserService.ts", AppError and ResponseUtils are used.
 
 An example of using AppError would be if a specific user was not found:
 
