@@ -449,13 +449,13 @@ Inside `app/config/auth.ts` set strategy to "web".
         const { email, password } = request.body;
         const user = await SessionService.getUser(email, password);
 
-        Auth.login({
+        await Auth.login({
           session: {
             request,
             response,
             next,
             user,
-            redirectPath: "/logout",
+            redirectPath: "/",
           },
         });
       } catch (error: any) {
@@ -469,21 +469,45 @@ Inside `app/config/auth.ts` set strategy to "web".
   `useRouter.get("/", isAuthenticated, (req, res) => res.render("home"));`
 
 - To make logout is like:
+
   ```
   static async destroy(request: Request, response: Response, next: Next) {
     try {
-      Auth.logout({
+      await Auth.logout({
         session: {
           request,
           response,
           next,
-          redirectPath: "/login",
+          redirectPath: "/",
         },
       });
     } catch (error: any) {
       return ApiResponse.error(response, error);
     }
   }
+  ```
+
+  **PS:** If you are using session strategy, do not use ApiResponse or an error will be thrown, for example:
+
+  ```
+  const result = await Auth.login({
+    session: {
+      request,
+      response,
+      next,
+      user,
+      redirectPath: "/",
+    },
+  });
+
+  return ApiResponse.success(response, result, "/");
+  ```
+
+  The error:
+
+  ```
+  uncaughtException signal received.
+  Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
   ```
 
 ### Token Strategy
