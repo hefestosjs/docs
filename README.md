@@ -5,6 +5,7 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
 ## Summary
 
 - [HefestosJS Docs](#hefestosjs-docs)
+  - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Command Scripts](#command-scripts)
   - [Env](#env)
@@ -26,6 +27,11 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
   - [Authentication](#authentication)
   - [Mailer](#mailer)
   - [References](#references)
+
+## Prerequisites:
+
+- Node 16.x or higher,
+- Redis
 
 ## Installation
 
