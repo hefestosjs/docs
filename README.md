@@ -361,7 +361,7 @@ renderHtml("mails/marketing.nj", userName);
 We recommend keeping email templates in the mails directory.
 
 **File**
-You can import the File from "core/modules".
+You can import the File module from "core/modules".
 
 ```typescript
 // Used to check if a file or directory exists.
@@ -386,6 +386,28 @@ await File.loadStream(stream);
 // Return the buffer.
 await File.createBuffer("/file_path");
 ```
+
+**S3**
+Through the S3 module you can add or remove files from the s3 bucket. The S3 module has 2 functions `put` and `delete`.
+
+`put` - expects to receive the parameters:
+
+```typescript
+key: string;
+body: Buffer;
+contentType: string;
+```
+
+`delete` - expects to receive the parameters:
+
+```typescript
+fileName: string;
+folder?: string;
+```
+
+PS: To upload files to S3, we recommend using the `uploadTo` module from "core/modules".
+
+You can import the S3 module from "core/modules".
 
 ## Layouts, views and partials
 
