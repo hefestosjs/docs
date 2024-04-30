@@ -371,6 +371,9 @@ File.exists("/file_path");
 // User to rename a file or directory.
 File.rename("/file_path/file_name", "/file_path/new_file_name");
 
+// User to move a file to a new directory.
+File.move("/old_path", "/new_path");
+
 // User to delete a file or directory.
 File.remove("/file_path");
 
