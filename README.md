@@ -18,6 +18,7 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
   - [Layouts, views and partials](#layouts-views-and-partials)
   - [Validation](#validation)
   - [Tests](#tests)
+  - [Factories](#factories)
   - [Tasks and Jobs](#tasks-and-jobs)
   - [Security](#security)
   - [Performance](#performance)
@@ -48,6 +49,8 @@ npx hefestos-forge hello-world
 - `start` - starts the server in production environment.
 
 - `dev` - starts the server in development environment, monitoring the code and tailwind changes.
+
+- `ms` - starts the server in a development environment, monitoring only changes to the code.
 
 - `test` - starts the tests
 
@@ -203,16 +206,45 @@ In direct routes, you can pass a middleware to a route after the path, for examp
 In resource routes, you can pass a middleware within an array after the Controller, for example:
 `useRouter.resources("users", "UsersController", [isAuthenticated]);`
 
-You can import the upload module and pass it as middleware, for example:
+You can import the `upload` internal middleware from `core/middlewares` and pass it as middleware. The `upload` is a function that can receive an object with folder name. For example: `upload().single("file")` or `upload({ folder: 'images' }).single("file")`.
 
-```
+```typescript
 import { Router } from "core/router";
-import { upload } from "core/modules";
+import { upload } from "core/middlewares";
 
 const useRouter = Router();
 
-useRouter.post("/upload", upload.single("file"), (req, res) => {
+useRouter.post("/upload", upload().single("file"), (req, res) => {
   return res.json(req.file?.filename);
+});
+
+export default useRouter;
+```
+
+The `upload` internal middleware will upload to the local `uploads` directory. If you pass a folder as a parameter, this folder will be created within `uploads`. In the case of `upload({ folder: 'images' }).single("file")`, the "images" folder will be created within `uploads`, and the files sent via the "file" field will be stored within it.
+
+To upload to an aws s3 bucket, you must import the `uploadTo` module from "core/modules". For example:
+
+```typescript
+import { Router } from "core/router";
+import { upload } from "core/middlewares";
+import { uploadTo } from "core/modules";
+import { ApiResponse, AppError } from "core";
+
+const useRouter = Router();
+
+useRouter.post("/media", upload().single("file"), async (request, response) => {
+  try {
+    if (!request.file) {
+      throw AppError.E_VALIDATION_FAIL("The file is required.");
+    }
+
+    await uploadTo.s3({ fileName: request.file.filename, file: request.file });
+
+    return ApiResponse.success(response, true);
+  } catch (error: any) {
+    return ApiResponse.error(response, error);
+  }
 });
 
 export default useRouter;
@@ -228,6 +260,8 @@ registerRouter("/", (req, res, next) => {
 ```
 
 ## Helpers and Hooks
+
+You can import the helpers from "core/helpers".
 
 **AppError**
 
@@ -326,6 +360,30 @@ renderHtml("mails/marketing.nj", userName);
 
 We recommend keeping email templates in the mails directory.
 
+**File**
+You can import the File from "core/modules".
+
+```typescript
+// Used to check if a file or directory exists.
+// Return a boolean value.
+File.exists("/file_path");
+
+// User to rename a file or directory.
+File.rename("/file_path/file_name", "/file_path/new_file_name");
+
+// User to delete a file or directory.
+File.remove("/file_path");
+
+// Used to load a stream and return a buffer.
+// Expect a stream value.
+// If you want to get a buffer from a file, use the File.createBuffer.
+await File.loadStream(stream);
+
+// Used to create a buffer from a file path.
+// Return the buffer.
+await File.createBuffer("/file_path");
+```
+
 ## Layouts, views and partials
 
 We use Nunjucks as template engine. For more references about nunjucks, access the official documentation at https://mozilla.github.io/nunjucks/
@@ -335,6 +393,26 @@ Layouts, views, and partials must remain in their respective directories. Inside
 ## Tests
 
 We use Jest or automation testing. For more references about Jest, access the official documentation at https://jestjs.io/
+
+## Factories
+
+Factories are used to define a blueprint of a data structure and then using that blueprint to generate dummy data. You can create a Factory using our generator with the command `yarn g` and selecting the factory option, or just using `yarn g factory ModelName`. Let’s check out this example.
+
+First, we'll use the command `yarn g factory ContentCreator` and the file will be generated in `/app/database/factories/ContentCreatorFactory.ts`. Inside the ContentCreatorFactory file, we'll set the properties like this.
+
+```typescript
+import { Factory } from "core/modules";
+import { ContentCreator } from "..";
+
+export default new Factory().define(ContentCreator, (faker) => {
+  return {
+    name: faker.person.fullName(),
+    biography: faker.lorem.sentence(4),
+  };
+});
+```
+
+The factories uses the @faker-js library. For more references about @faker-js, access the official documentation at https://fakerjs.dev/
 
 ## Tasks and Jobs
 
@@ -648,3 +726,4 @@ We use some libraries under the hood, so for more informations, visit the offici
 - AWS SDK
 - Nunjucks
 - Tailwind
+- FakerJS
