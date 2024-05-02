@@ -114,6 +114,27 @@ In the .env file, the DB_URL variable changes according to the bank you choose, 
 - MySQL: `DB_URL=mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`
 - SQLite: `DB_URL="file:./dev.db"`
 
+If you want to do a raw query, you can use the Database handler located in the `app/database/database.ts` directory. This handler is just an abstraction of Prisma's native functions, so instead of doing:
+
+```typescript
+const [posts, totalPosts] = await prisma.$transaction([
+  prisma.post.findMany({ where: { title: { contains: "prisma" } } }),
+  prisma.post.count(),
+]);
+```
+
+You will be able to do:
+
+```typescript
+import { Database } from "app/database/database";
+import { Post } from "app/database";
+
+const [posts, totalPosts] = await Database.transaction([
+  Post.findMany({ where: { title: { contains: "prisma" } } }),
+  Post.count(),
+]);
+```
+
 For more information, visit the official documentation.
 
 ## Routes
