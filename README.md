@@ -523,7 +523,33 @@ Layouts, views, and partials must remain in their respective directories. Inside
 
 ## Tests
 
-We use Jest and Supertest. For more references about Jest, access the official documentation at https://jestjs.io/
+For test routes from the api, you can use the Supertest. You can import Supertest from: `import { Supertest } from "core/modules";` and use like:
+
+```typescript
+import { describe, it, expect } from "@jest/globals";
+import { Supertest } from "core/modules";
+
+descript("List posts", () => {
+  it("Successfully list the posts", async () => {
+    // Creating some posts for the list
+    // ...
+
+    // Main request
+    const { body, status } = await Supertest.get("/posts");
+
+    expect(status).toBe(200);
+    expect(body).toEqual(
+      expect.objectContaining({
+        status: "OK",
+        error: null,
+        // result: ...
+      })
+    );
+  });
+});
+```
+
+We use Jest and Supertest. For more references about Jest, access the official documentation at https://jestjs.io/ and https://github.com/ladjs/supertest.
 
 ## Factories
 
