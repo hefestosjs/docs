@@ -22,6 +22,7 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
     - [renderHtml](#renderhtml)
     - [File](#file)
     - [S3](#s3)
+    - [useRequest](#userequest)
   - [Layouts, views and partials](#layouts-views-and-partials)
   - [Validation](#validation)
   - [Tests](#tests)
@@ -514,6 +515,46 @@ await S3.delete({ fileName: media.url, folder: media.userId });
 PS: To upload files to S3, we recommend using the `uploadTo` module from "core/modules".
 
 You can import the File module like this: `import { File } from 'core/modules';`.
+
+### useRequest
+
+useRequest is a utility module designed to facilitate handling HTTP requests. It provides a set of methods for making various types of requests to external APIs or services, including GET, POST, PUT, PATCH, and DELETE.
+
+Example usage scenarios for useRequest include:
+
+```typescript
+// Sending a GET request:
+await useRequest.GET({ url: "https://api.example.com", path: "endpoint" });
+
+// Sending a POST request with a request body:
+await useRequest.POST({
+  url: "https://api.example.com/",
+  path: "endpoint",
+  body: { key: "value" },
+  headers: { "Custom-Header": "value" },
+});
+
+// Sending a PUT request to update data:
+await useRequest.PUT({
+  url: "https://api.example.com",
+  path: "endpoint",
+  body: { key: "updatedValue" },
+});
+
+// Sending a PATCH request to partially update data:
+await useRequest.PATCH({
+  url: "https://api.example.com",
+  path: "endpoint",
+  body: { key: "newValue" },
+});
+
+// Sending a DELETE request:
+await useRequest.DELETE({ url: "https://api.example.com", path: "endpoint" });
+```
+
+The useRequest module simplifies making requests and handling responses by abstracting the details of the HTTP methods and request setup. The useRequest accepts json and formData in its body. By default, Content-Type: application/json is already implemented in the header, but this changes if you decide to use formData.
+
+You can import it like this: `import { useRequest } from 'core/helpers';`
 
 ## Layouts, views and partials
 
