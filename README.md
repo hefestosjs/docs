@@ -15,6 +15,13 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
   - [Services](#services)
   - [Upload and Middlewares](#upload-and-middlewares)
   - [Helpers and Hooks](#helpers-and-hooks)
+    - [AppError](#apperror)
+    - [ResponseUtils](#responseutils)
+    - [ApiResponse](#apiresponse)
+    - [useCache](#usecache)
+    - [renderHtml](#renderhtml)
+    - [File](#file)
+    - [S3](#s3)
   - [Layouts, views and partials](#layouts-views-and-partials)
   - [Validation](#validation)
   - [Tests](#tests)
@@ -26,6 +33,8 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
   - [Generate files](#generate-files)
   - [Logs](#logs)
   - [Authentication](#authentication)
+    - [Session Strategy](#session-strategy)
+    - [Token Strategy](#token-strategy)
   - [Mailer](#mailer)
   - [References](#references)
 
@@ -53,10 +62,6 @@ npx hefestos-forge hello-world
 - `ms` - starts the server in a development environment, monitoring only changes to the code.
 
 - `test` - starts the tests
-
-- `test:watch` - starts the tests while monitoring the changes.
-
-- `coverage` - starts the coverage tests.
 
 - `g` - used to generate files, like controllers, services, views, validations and more.
 
@@ -143,20 +148,20 @@ You will often create resourceful routes to do CRUD operations on a resource.
 
 `useRouter.resource` assigns CRUD routes to a controller using a single line of code:
 
-```
+```typescript
 // app/routes/index.ts
 
 // This...
-useRouter.resource('users', 'UsersController')
+useRouter.resource("users", "UsersController");
 
 // ...equates to this:
-useRouter.get('users', UserController.index);
-useRouter.get('users/details/:id', UserController.show);
-useRouter.get('users/create', UserController.create);
-useRouter.post('users', UserController.store);
-useRouter.get('users/edit/:id', UserController.edit);
-useRouter.put('users/:id', UserController.update);
-useRouter.delete('users/:id', UserController.destroy);
+useRouter.get("users", UserController.index);
+useRouter.get("users/details/:id", UserController.show);
+useRouter.get("users/create", UserController.create);
+useRouter.post("users", UserController.store);
+useRouter.get("users/edit/:id", UserController.edit);
+useRouter.put("users/:id", UserController.update);
+useRouter.delete("users/:id", UserController.destroy);
 ```
 
 You can pass a middleware between the path and the Controller.
@@ -164,7 +169,7 @@ You can pass a middleware between the path and the Controller.
 
 Default router file.
 
-```
+```typescript
 // app/routes/index.ts
 
 import { Router } from "core/router";
@@ -197,13 +202,28 @@ You can import the Request and Response interfaces from within "core", for examp
 
 ## Services
 
-The service is a class and can have as many functions as you want, but if you generate the Service using the command line, by default, the functions that are created next to the service are:
+Aqui está o texto mesclado de forma coerente:
+
+---
+
+Our code generator will generate 2 approaches for services: a single-file approach or a multiple-files approach. The service in a single file has each method as a functionality, but if you choose the multiple-files approach, each file will contain a single method. The service as a single file is a class and can have as many functions as you want, but if you generate the service using the command line, by default, the functions created alongside the service are:
+
+For the single-file approach, the command line will generate file with a class that can have as many functions as you want, and by default, the functions created alongside the service are:
 
 - index
 - show
 - store
 - update
 - destroy
+
+For the multiple-files approach, the command line will generate a folder with the name you chose, containing the files:
+
+- index.ts
+- Create.ts
+- Update.ts
+- List.ts
+- Show.ts
+- Delete.ts
 
 You can import the AppError interface from within "core" to trigger specific errors, for example: `import { AppError } from "core";`. If necessary, you can also import the ResponseUtils file, which has functions that help with pagination, deleting data, such as a password, an object or an array of objects. The functions are:
 
@@ -247,10 +267,10 @@ The `upload` internal middleware will upload to the local `uploads` directory. I
 To upload to an aws s3 bucket, you must import the `uploadTo` module from "core/modules". For example:
 
 ```typescript
+import { ApiResponse, AppError } from "core";
 import { Router } from "core/router";
 import { upload } from "core/middlewares";
 import { uploadTo } from "core/modules";
-import { ApiResponse, AppError } from "core";
 
 const useRouter = Router();
 
@@ -273,20 +293,26 @@ export default useRouter;
 
 For register your own middlewares, you can use the `registerMiddleware` function. For example:
 
-```
+```typescript
 registerRouter("/", (req, res, next) => {
-  console.log('Request Type:', req.method);
+  console.log("Request Type:", req.method);
   next();
-})
+});
 ```
 
 ## Helpers and Hooks
 
 You can import the helpers from "core/helpers".
 
-**AppError**
+#### AppError
 
-```javascript
+AppError is a utility class designed to throw predefined exceptions in an API. It provides a standardized way to handle various types of errors, making error management consistent and predictable.
+
+You can import it like this: `import { AppError } from 'core/helpers';`.
+
+AppError examples:
+
+```typescript
 // Example: used when an unexpected error occurs
 throw AppError.E_BAD_REQUEST();
 
@@ -312,7 +338,19 @@ throw AppError.E_UNAUTHORIZED();
 throw AppError.E_VALIDATION_FAIL();
 ```
 
-**ResponseUtils**
+### ResponseUtils
+
+ResponseUtils is a utility class designed to refine and format method responses in an API. It provides methods for various common tasks, including:
+
+- Excluding specific fields from an object, such as removing sensitive information like passwords or phone numbers before returning a user object.
+- Excluding specific fields from an array of objects, useful for scenarios like returning a list of users without exposing their passwords.
+- Paginating data, to efficiently handle and return large datasets in manageable chunks.
+
+Example usage includes cleaning up user data before sending it in a response or paginating a list of users for easier navigation.
+
+You can import it like this: `import { ResponseUtils } from 'core/helpers';`.
+
+ResponseUtils examples:
 
 ```typescript
 // Used when you want to delete data from an object.
@@ -341,9 +379,19 @@ class UserService {
 }
 ```
 
-**ApiResponse**
+### ApiResponse
 
-```javascript
+ApiResponse is a utility class designed to standardize the responses from the controller in an API. It provides structured methods to handle various types of responses, including:
+
+- Successful operations, such as redirecting the user after a new post is registered or displaying a single post.
+- Paginated data responses for displaying lists of posts or other items.
+- Error handling, both for general errors and specific application errors, typically used within the catch blocks of try-catch statements.
+
+Example usage scenarios include registering a new user, paginating a list of posts, or managing errors encountered during API requests.
+
+ApiResponse examples:
+
+```typescript
 // Used when you successfully complete a request
 // Example 1: When you successfully register a new post and then want to redirect the user to the listing screen.
 // Example 2: When you want to display only 1 post.
@@ -362,9 +410,11 @@ ApiResponse.error(response, error);
 ApiResponse.appError(response, error);
 ```
 
-**useCache**
+### useCache
 
-```javascript
+useCache is a utility module designed for managing cache operations in an application. It provides methods to interact with the cache, enabling efficient data retrieval and storage.
+
+```typescript
 // Used to check whether a given key exists in the cache.
 await useCache.get(key);
 
@@ -372,17 +422,25 @@ await useCache.get(key);
 await useCache.set(key, JSON.stringify(data));
 ```
 
-**renderHtml**
-With renderHtml, you can pass variables to the email template using `renderHtml("mails/file.nj", variable_name);`. For example:
+### renderHtml
+
+renderHtml is a utility function designed for rendering email templates with dynamic content. By passing variables to the email template, you can customize the content based on specific data.
+
+Example usage scenario for renderHtml:
+
+Rendering a marketing email template with a user's name
 
 ```typescript
 renderHtml("mails/marketing.nj", userName);
 ```
 
-We recommend keeping email templates in the mails directory.
+We recommend keeping email templates in the mails directory for better organization and maintainability.
 
-**File**
-You can import the File module from "core/modules".
+You can import it like this: `import { renderHtml } from 'core/helpers';`.
+
+### File
+
+The File module provides various utilities for handling file and directory operations. You can import the File module like this: `import { File } from 'core/modules';`.
 
 ```typescript
 // Used to check if a file or directory exists.
@@ -408,7 +466,8 @@ await File.loadStream(stream);
 await File.createBuffer("/file_path");
 ```
 
-**S3**
+### S3
+
 Through the S3 module you can add or remove files from the s3 bucket. The S3 module has 2 functions `put` and `delete`.
 
 `put` - expects to receive the parameters:
@@ -419,6 +478,21 @@ body: Buffer;
 contentType: string;
 ```
 
+Put example:
+
+```typescript
+const key = join(params.folder || "", params.fileName);
+const body = await File.createBuffer(filePath);
+
+const config = {
+  key,
+  body,
+  contentType: "image/png",
+};
+
+await S3.put(config);
+```
+
 `delete` - expects to receive the parameters:
 
 ```typescript
@@ -426,9 +500,20 @@ fileName: string;
 folder?: string;
 ```
 
+Delete example:
+
+```typescript
+const media = {
+  url: "file.jpg",
+  userId: 2,
+};
+
+await S3.delete({ fileName: media.url, folder: media.userId });
+```
+
 PS: To upload files to S3, we recommend using the `uploadTo` module from "core/modules".
 
-You can import the S3 module from "core/modules".
+You can import the File module like this: `import { File } from 'core/modules';`.
 
 ## Layouts, views and partials
 
@@ -438,7 +523,7 @@ Layouts, views, and partials must remain in their respective directories. Inside
 
 ## Tests
 
-We use Jest or automation testing. For more references about Jest, access the official documentation at https://jestjs.io/
+We use Jest and Supertest. For more references about Jest, access the official documentation at https://jestjs.io/
 
 ## Factories
 
@@ -474,12 +559,13 @@ By default, following the Content Security Policy directives, you cannot use in-
 
 ## Performance
 
-To improve our application performance, we can use some strategies like cache, cluster and compression.
-Inside the `app/config/performance.ts` file, you can active cluster server, cache strategy and define cache life time in seconds. If cache is active, we'll use redis to store the cache.
+To improve our application performance, we can use some strategies like cache, redis, cluster and compression.
+
+Inside the `app/config/performance.ts` file, you can active cluster server, redis, cache strategy and define cache life time in seconds. If cache and redis are active, we'll use redis to store the cache.
 
 We can cache our query results like:
 
-```
+```typescript
   // app/services/UserService.ts
 
   static async index(currentPage: number = 1) {
@@ -548,7 +634,7 @@ You can enable or disable logs in the `app/config/logs.ts` file by changing the 
 
 We have 2 strategies, session and token. You can configure your authentication options like table and unique column used to sign in, strategy and more inside `app/config/auth.ts`.
 
-```
+```typescript
 const auth: AuthConfig = {
   strategy: "web",
   table: "users",
@@ -557,6 +643,17 @@ const auth: AuthConfig = {
     secret: process.env.JWT_SECRET || "secret",
     expiresIn: "30d",
     useRedis: true,
+  },
+  sessionStrategy: {
+    useRedis: true,
+    prefix: "myapp:", // RedisStore prefix
+    secret: process.env.SESSION_SECRET || "secret",
+    resave: false, // Required: force lightweight session keep alive (touch)
+    saveUninitialized: false, // Recommended: only save session when data exists
+    cookie: {
+      httpOnly: true, // If true prevent client side JS from reading the cookie
+      maxAge: 90 * 24 * 60 * 60 * 1000, // Session max age in miliseconds (3 months in this case)
+    },
   },
 };
 ```
@@ -567,12 +664,15 @@ Inside `app/config/auth.ts` set strategy to "web".
 
 - To make login is like:
 
-  ```
+  ```typescript
     static async store(request: Request, response: Response, next: Next) {
       try {
         const { email, password } = request.body;
+
+        // Check if the credentials are valid and if user exists
         const user = await SessionService.getUser(email, password);
 
+        // You can import it from vendor/auth
         await Auth.login({
           session: {
             request,
@@ -583,7 +683,7 @@ Inside `app/config/auth.ts` set strategy to "web".
           },
         });
       } catch (error: any) {
-        return ApiResponse.error(response, error);
+        console.log(error);
       }
     }
   ```
@@ -594,9 +694,10 @@ Inside `app/config/auth.ts` set strategy to "web".
 
 - To make logout is like:
 
-  ```
+  ```typescript
   static async destroy(request: Request, response: Response, next: Next) {
     try {
+      // You can import it from vendor/auth
       await Auth.logout({
         session: {
           request,
@@ -606,14 +707,14 @@ Inside `app/config/auth.ts` set strategy to "web".
         },
       });
     } catch (error: any) {
-      return ApiResponse.error(response, error);
+      console.log(error);
     }
   }
   ```
 
   **PS:** If you are using session strategy, do not use ApiResponse or an error will be thrown, for example:
 
-  ```
+  ```typescript
   const result = await Auth.login({
     session: {
       request,
@@ -640,12 +741,15 @@ Inside `app/config/auth.ts` set strategy to "token".
 
 - To make login is like:
 
-  ```
+  ```typescript
   static async store(request: Request, response: Response, next: Next) {
     try {
       const { email, password } = request.body;
+
+      // Check if the credentials are valid and if user exists
       const user = await SessionService.getUser(email, password);
 
+      // You can import it from vendor/auth
       const result = await Auth.login({
         token: {
           request,
@@ -655,7 +759,7 @@ Inside `app/config/auth.ts` set strategy to "token".
         },
       });
 
-      return ApiResponse.success(response, result, "/");
+      return ApiResponse.success(response, result);
     } catch (error: any) {
       return ApiResponse.error(response, error);
     }
@@ -670,9 +774,10 @@ PS: remember that if you're using token strategy, you must use the Authorization
 
 - To make logout is like:
 
-  ```
+  ```typescript
   static async destroy(request: Request, response: Response, next: Next) {
     try {
+      // You can import it from vendor/auth
       const result = await Auth.logout({
         token: {
           request,
@@ -680,14 +785,16 @@ PS: remember that if you're using token strategy, you must use the Authorization
         },
       });
 
-      return ApiResponse.success(response, result, "/");
+      return ApiResponse.success(response, result);
     } catch (error: any) {
       return ApiResponse.error(response, error);
     }
   }
   ```
 
-Both the session and the tokens are stored within redis. If, when using token strategy, you do not want to store the token in redis or if you want to make any changes, you can modify in `vendor/auth/token.ts`.
+Both the session and the tokens can be stored in redis. If, when using token strategy, you do not want to store the token in redis or if you want to make any changes, you can modify in `vendor/auth/token.ts`.
+
+To use redis for authentication, useRedis in the `app/config/auth.ts` must be true, and redis in `app/config/performance.ts` must be true.
 
 ## Mailer
 
@@ -709,7 +816,7 @@ await Mailer.sendMail({
 
 We recommend using the renderHtml function that you can import from "core" to turn your HTML email template into a string. We also recommend that you always send the email message in text in addition to HTML.
 
-In renderHtml you will pass the file path with extension, for example: renderHtml("mails/contact.nj");
+In renderHtml you will pass the file path with extension, for example: `renderHtml("mails/contact.nj");`
 
 We recommend keeping email templates in the mails directory.
 
@@ -768,6 +875,7 @@ We use some libraries under the hood, so for more informations, visit the offici
 - Nodemailer
 - Zod
 - Jest
+- Supertest
 - Cors
 - AWS SDK
 - Nunjucks
