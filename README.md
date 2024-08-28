@@ -1,6 +1,6 @@
 # HefestosJS Docs
 
-Welcome! HefestosJS is an MVC solution to develop your web application more easily and quickly. With a focus on productivity, HefestosJS is already configured for authentication using jwt tokens or sessions, sending emails, periodic tasks and jobs, uploading files to local driver or AWS S3 and much more.
+Welcome! HefestosJS is an MVC solution to develop your web application more easily and quickly. With a focus on productivity, HefestosJS is already configured for authentication using jwt tokens or sessions, sending emails, periodic tasks and jobs, uploading files to local driver or AWS S3 and much more. HefestosJS can be used with Node.js or Bun.
 
 ## Summary
 
@@ -41,20 +41,24 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
 
 ## Prerequisites:
 
-- Node 16.x or higher,
+- Node (v16.x or higher) or Bun (v1.1.20 or higher),
 - Redis
 
 ## Installation
 
 You can create a new project using the command:
 
-```
-npx hefestos-forge hello-world
+```javascript
+npx hefestos-forge
+
+// or
+
+bunx hefestos-forge
 ```
 
 ## Command Scripts
 
-- `build` - delete the current dist folder (if exists), copy the resources files (views, partials, layouts) and transpile the typescript to the dist folder.
+- `build` - delete the current dist folder (if exists), copy the resources files (views, partials, layouts) and transpile the typescript to the dist folder (available only in node.js runtime).
 
 - `start` - starts the server in production environment.
 
@@ -681,7 +685,7 @@ If DRIVE chosen in the .env file is "local", you can create the "uploads" folder
 
 ## Generate files
 
-Using the `npm run g` command line you can generate:
+Using the `npm run g` or `bun g` command line you can generate:
 
 - controller
 - service
@@ -690,8 +694,6 @@ Using the `npm run g` command line you can generate:
 - test
 - layout
 - view
-
-You can abbreviate the command using the command line, generator and file name, for example: `npm run g controller Post`. The "PostController.ts" file will be created inside the `app/controllers` folder.
 
 ## Logs
 
@@ -948,3 +950,4 @@ We use some libraries under the hood, so for more informations, visit the offici
 - Nunjucks
 - Tailwind
 - FakerJS
+- BiomeJS
