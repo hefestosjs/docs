@@ -198,7 +198,7 @@ Responsible for handling requests and directing them to the appropriate action, 
 - update
 - destroy
 
-You can import the Request and Response interfaces from within "core", for example: `import { Request, Response } from "core";`. If you are building an api, you can also import and use ApiResponse which contains the functions:
+You can import the Request and Response interfaces from within "core", for example: `import type { Request, Response } from "core";`. If you are building an api, you can also import and use ApiResponse which contains the functions:
 
 - success,
 - pagination,
@@ -206,10 +206,6 @@ You can import the Request and Response interfaces from within "core", for examp
 - appError
 
 ## Services
-
-Aqui está o texto mesclado de forma coerente:
-
----
 
 Our code generator will generate 2 approaches for services: a single-file approach or a multiple-files approach. The service in a single file has each method as a functionality, but if you choose the multiple-files approach, each file will contain a single method. The service as a single file is a class and can have as many functions as you want, but if you generate the service using the command line, by default, the functions created alongside the service are:
 
