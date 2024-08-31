@@ -188,7 +188,7 @@ export default useRouter;
 
 ## Controllers
 
-Responsible for handling requests and directing them to the appropriate action, the controller is a class and can have as many and as many functions as you want, but if you use the `.resources` method or if you generate the controller using the command line, by default, the functions that must exist in the controller are:
+Responsible for handling requests and directing them to the appropriate action, the controller is a class and can have as many functions as you want, but if you use the `.resources` method or if you generate the controller using the command line, by default, the functions that must exists in the controller are:
 
 - index
 - show
@@ -198,7 +198,18 @@ Responsible for handling requests and directing them to the appropriate action, 
 - update
 - destroy
 
-You can import the Request and Response interfaces from within "core", for example: `import type { Request, Response } from "core";`. If you are building an api, you can also import and use ApiResponse which contains the functions:
+```typescript
+const useRouter = Router();
+
+useRouter.resources("path", "ControllerName", [
+  middleware,
+  { method: "store", middleware: customMiddleware },
+]);
+```
+
+To better understand how middleware works, read the [middleware](#upload-and-middlewares) section.
+
+You can import the Request and Response interfaces from within "core", for example: `import type { Request, Response } from "core";`. If you are building an api, you can also import and use [ApiResponse](#apiresponse) which contains the functions:
 
 - success,
 - pagination,
@@ -243,10 +254,25 @@ We use Zod as validator. For more references about Zod, access the official docu
 ## Upload and Middlewares
 
 In direct routes, you can pass a middleware to a route after the path, for example:
-`useRouter.get('/users', isAuthenticated, (req, res) => res.render('users));`
 
-In resource routes, you can pass a middleware within an array after the Controller, for example:
-`useRouter.resources("users", "UsersController", [isAuthenticated]);`
+```typescript
+useRouter.get('/users', isAuthenticated, (req, res) => res.render('users));
+```
+
+In resource routes, you can pass a middleware within an array after the Controller to execute for all resource methods, for example:
+
+```typescript
+useRouter.resources("users", "UsersController", [isAuthenticated]);
+```
+
+But if you want to use a middleware in a specific resource method, you can pass an object with the method and middleware, for exemple:
+
+```typescript
+useRouter.resources("users", "UsersController", [
+  isAuthenticated,
+  { method: "store", middleware: upload().single("file") },
+]);
+```
 
 You can import the `upload` internal middleware from `core/middlewares` and pass it as middleware. The `upload` is a function that can receive an object with folder name. For example: `upload().single("file")` or `upload({ folder: 'images' }).single("file")`.
 
