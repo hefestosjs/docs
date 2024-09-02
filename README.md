@@ -24,6 +24,8 @@ Welcome! HefestosJS is an MVC solution to develop your web application more easi
     - [S3](#s3)
     - [useRequest](#userequest)
   - [Layouts, views and partials](#layouts-views-and-partials)
+    - [Forms](#forms)
+    - [Template Engine](#template-engine)
   - [Validation](#validation)
   - [Tests](#tests)
   - [Factories](#factories)
@@ -583,6 +585,21 @@ The useRequest module simplifies making requests and handling responses by abstr
 You can import it like this: `import { useRequest } from 'core/helpers';`
 
 ## Layouts, views and partials
+
+### Forms:
+
+In many cases, such as when using forms, some HTTP methods (e.g. PUT and DELETE) are not directly supported by browsers. To address this limitation, method-override allows us to use a supported HTTP method, such as POST, and override the original method in the application.
+
+To use method-override, simply create a hidden field in the form with the name "\_method" and the value being the method you want, for example:
+
+```html
+<form method="POST" action="/resource">
+  <input type="hidden" name="_method" value="DELETE" />
+  <button type="submit">Delete resource</button>
+</form>
+```
+
+### Template Engine
 
 We use Nunjucks as template engine. For more references about nunjucks, access the official documentation at https://mozilla.github.io/nunjucks/
 
