@@ -637,9 +637,9 @@ We use Jest and Supertest. For more references about Jest, access the official d
 
 ## Factories
 
-Factories are used to define a blueprint of a data structure and then using that blueprint to generate dummy data. You can create a Factory using our generator with the command `yarn g` and selecting the factory option, or just using `yarn g factory ModelName`. Let’s check out this example.
+Factories are used to define a blueprint of a data structure and then using that blueprint to generate dummy data. You can create a Factory using our generator with the command `npm run g` and selecting the factory option. Let’s check out this example.
 
-First, we'll use the command `yarn g factory ContentCreator` and the file will be generated in `/app/database/factories/ContentCreatorFactory.ts`. Inside the ContentCreatorFactory file, we'll set the properties like this.
+First, we'll use the command `npm run g`, select the factory option and name ContentCreator, and the file will be generated in `/app/database/factories/ContentCreatorFactory.ts`. Inside the ContentCreatorFactory file, we'll set the properties like this.
 
 ```typescript
 import { Factory } from "core/modules";
@@ -657,7 +657,7 @@ The factories uses the @faker-js library. For more references about @faker-js, a
 
 ## Tasks and Jobs
 
-For create a new periodic task, you can use the command line, `yarn g`, select the "task" option and enter the task name. As the first argument of the `createSchedule` function, you will use the cron format. For the second argument, you must pass the task function.
+For create a new periodic task, you can use the command line, `npm run g`, select the "task" option and enter the task name. As the first argument of the `createSchedule` function, you will use the cron format. For the second argument, you must pass the task function.
 
 We use the node-cron library under the hood, so for more information, visit the official documentation at https://github.com/node-cron/node-cron
 
@@ -726,11 +726,11 @@ If DRIVE chosen in the .env file is "local", you can create the "uploads" folder
 
 Using the `npm run g` or `bun g` command line you can generate:
 
-- controller
-- service
 - validation
-- task
+- service
+- controller
 - test
+- task
 - layout
 - view
 
