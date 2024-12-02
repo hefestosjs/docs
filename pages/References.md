@@ -28,12 +28,12 @@ We use some libraries under the hood, so for more informations, visit the offici
 
 ## Summary
 
-- [HefestosJS Docs](/README)
+- [HefestosJS Docs](/docs)
 
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Command Scripts](#command-scripts)
-  - [Env](#env)
+  - [Prerequisites](/docs#prerequisites)
+  - [Installation](/docs#installation)
+  - [Command Scripts](/docs#command-scripts)
+  - [Env](/docs#env)
   - [Database](/docs/pages/Database)
   - [Routes](/docs/pages/Routes)
   - [Controllers](/docs/pages/Controllers)

@@ -6,12 +6,12 @@ Read more about the Content Security Policy in https://developer.mozilla.org/pt-
 
 ## Summary
 
-- [HefestosJS Docs](/README)
+- [HefestosJS Docs](/docs)
 
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Command Scripts](#command-scripts)
-  - [Env](#env)
+  - [Prerequisites](/docs#prerequisites)
+  - [Installation](/docs#installation)
+  - [Command Scripts](/docs#command-scripts)
+  - [Env](/docs#env)
   - [Database](/docs/pages/Database)
   - [Routes](/docs/pages/Routes)
   - [Controllers](/docs/pages/Controllers)
